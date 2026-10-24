@@ -35,7 +35,12 @@ fi
 echo "==> [2/5] Setting up isolated Python virtual environment (./venv)..."
 if [ ! -f "$ROOT_DIR/venv/bin/python3" ]; then
     echo "    -> Creating clean virtual environment..."
-    python3 -m venv "$ROOT_DIR/venv"
+    if ! python3 -m venv "$ROOT_DIR/venv" 2>/dev/null; then
+        echo "❌ Error: Failed to create virtual environment."
+        echo "   Please ensure python3-venv is installed:"
+        echo "   sudo apt install python3-venv   (Ubuntu/Debian)"
+        exit 1
+    fi
     "$ROOT_DIR/venv/bin/pip" install --upgrade pip
     
     echo "    -> Installing core studio dependencies and Kokoro TTS..."

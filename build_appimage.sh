@@ -55,10 +55,13 @@ fi
 
 # Ensure real Python ELF binary is present inside venv/bin
 echo "    -> Embedding Python binary..."
-rm -f "$APP_DIR/venv/bin/python3.12"
-cp /usr/bin/python3.12 "$APP_DIR/venv/bin/python3.12"
-ln -sf python3.12 "$APP_DIR/venv/bin/python3"
-ln -sf python3.12 "$APP_DIR/venv/bin/python"
+REAL_PY="$(readlink -f "$ROOT_DIR/venv/bin/python3" 2>/dev/null || readlink -f "$(command -v python3)")"
+PY_VER="$("$ROOT_DIR/venv/bin/python3" -c 'import sys; print(f"python{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || echo "python3")"
+
+rm -f "$APP_DIR/venv/bin/python"*
+cp "$REAL_PY" "$APP_DIR/venv/bin/$PY_VER"
+ln -sf "$PY_VER" "$APP_DIR/venv/bin/python3"
+ln -sf "$PY_VER" "$APP_DIR/venv/bin/python"
 
 echo "==> [4/6] Creating AppRun and Desktop integration..."
 
@@ -95,7 +98,12 @@ APPDIR="${SELF%/*}"
 
 export APPDIR="${APPDIR}"
 export PATH="${APPDIR}/venv/bin:${APPDIR}/usr/bin:${PATH}"
-export PYTHONPATH="${APPDIR}/venv/lib/python3.12/site-packages:${PYTHONPATH}"
+PY_SITE_DIR="$(ls -d "${APPDIR}/venv/lib/python3."*/site-packages 2>/dev/null | head -n 1)"
+if [ -n "$PY_SITE_DIR" ]; then
+    export PYTHONPATH="${PY_SITE_DIR}:${PYTHONPATH}"
+else
+    export PYTHONPATH="${APPDIR}/venv/lib/python3.12/site-packages:${PYTHONPATH}"
+fi
 export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${APPDIR}/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
 
 # Workspace selection: custom arg -> current directory (if writable) -> ~/Desktop/SciFi-Studio-Workspace
@@ -161,6 +169,7 @@ if [ -z "$APPIMAGETOOL" ]; then
 fi
 
 # Package into AppImage
+export APPIMAGE_EXTRACT_AND_RUN=1
 ARCH=x86_64 "$APPIMAGETOOL" "$APP_DIR" "$OUTPUT_APPIMAGE"
 
 # Clean up AppDir staging
@@ -169,8 +178,10 @@ rm -rf "$APP_DIR"
 echo "==> [6/6] Finalizing AppImage..."
 chmod +x "$OUTPUT_APPIMAGE"
 
-# Optionally symlink to Desktop
-ln -sf "$OUTPUT_APPIMAGE" "$DESKTOP_OUTPUT"
+# Optionally symlink to Desktop if Desktop folder exists
+if [ -d "$HOME/Desktop" ]; then
+    ln -sf "$OUTPUT_APPIMAGE" "$DESKTOP_OUTPUT"
+fi
 
 echo "=========================================================="
 echo "  ✅ SUCCESS: AppImage built successfully!                "
