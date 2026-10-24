@@ -1,0 +1,59 @@
+# ==========================================
+# Large AI Models (Restored via ./install.sh)
+# ==========================================
+models/checkpoints/*.safetensors
+models/checkpoints/*.ckpt
+models/kokoro/*.onnx
+models/kokoro/*.bin
+
+# ==========================================
+# Virtual Environment & Python Caches
+# ==========================================
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+ENV/
+
+# ==========================================
+# AppImage Binaries & Build Staging
+# ==========================================
+*.AppImage
+AppDir/
+
+# ==========================================
+# Rendered Output Videos & Recordings
+# ==========================================
+*.mp4
+*.webm
+*.avi
+*.mov
+exports/*
+uploads/*
+!exports/.gitkeep
+!uploads/.gitkeep
+
+# ==========================================
+# Temporary Render & Audio Workspaces
+# ==========================================
+temp/
+temp_*/
+assets/*_audio/
+assets/*_panels/
+assets/*_snapshots/
+!assets/panels/
+!assets/audio/
+!assets/snapshots/
+
+# ==========================================
+# Logs, Backups & Credentials
+# ==========================================
+*.log
+backup/
+transcript_full-json.txt
+.env
+.env.*
+.DS_Store
