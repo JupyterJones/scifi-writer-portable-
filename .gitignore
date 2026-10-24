@@ -47,6 +47,7 @@ assets/*_snapshots/
 !assets/panels/
 !assets/audio/
 !assets/snapshots/
+mp3/All.mp3
 
 # ==========================================
 # Logs, Backups & Credentials
@@ -57,3 +58,18 @@ transcript_full-json.txt
 .env
 .env.*
 .DS_Store
+
+# Added by fix_git.py
+*.db
+*.sqlite
+*.sqlite3
+secrets.json
+config.json
+*.pem
+*.key
+*.crt
+*.bak
+*.old
+*.swp
+*.tmp
+Thumbs.db
